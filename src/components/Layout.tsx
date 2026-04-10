@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from './ui/dialog';
+import { createPortal } from 'react-dom';
 import { Textarea } from './ui/textarea';
 import { toast } from 'sonner';
 import { EdRealmLogo } from './EdRealmLogo';
@@ -620,81 +621,82 @@ export function Layout({ children, currentPage, onNavigate, hideSidebar = false 
           {children}
         </div>
       </main>
-      <Dialog open={isIssueDialogOpen} onOpenChange={setIsIssueDialogOpen}>
-        <DialogContent className={`p-0 flex flex-col overflow-hidden bg-white selection:bg-blue-100 selection:text-blue-900 ${
-          isMobile
-            ? 'fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 w-full max-w-full rounded-t-2xl rounded-b-none h-[92dvh]'
-            : 'sm:max-w-[1000px] w-[95vw] h-[90vh]'
-        }`}
-          style={isMobile ? { top: 'auto', left: 0, right: 0, bottom: 0, transform: 'none' } : {}}>
-
-          {/* Mobile drag handle */}
-          {isMobile && (
-            <div className="flex justify-center pt-3 pb-1 shrink-0">
-              <div className="w-10 h-1 rounded-full bg-neutral-300" />
+      {/* Issue Modal — custom portal bypasses Radix positioning on mobile */}
+      {isIssueDialogOpen && isMobile && createPortal(
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999 }}>
+          {/* Backdrop */}
+          <div
+            style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)' }}
+            onClick={() => setIsIssueDialogOpen(false)}
+          />
+          {/* Bottom Sheet */}
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '92dvh',
+            background: 'white',
+            borderRadius: '20px 20px 0 0',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}>
+            {/* Drag handle */}
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 6px', flexShrink: 0 }}>
+              <div style={{ width: 40, height: 4, borderRadius: 99, background: '#d1d5db' }} />
             </div>
-          )}
-
-          {/* Sticky header */}
-          <div className="shrink-0 flex items-center justify-between px-5 py-3 border-b border-neutral-100 bg-white">
-            <div>
-              <h2 className="text-lg font-bold text-slate-900 leading-tight">Raise an Issue</h2>
-              <p className="text-xs text-neutral-500 mt-0.5">Report bugs, platform issues, or support requests.</p>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 20px 12px', borderBottom: '1px solid #f3f4f6', flexShrink: 0, background: 'white' }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 18, color: '#0f172a' }}>Raise an Issue</div>
+                <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>Report bugs, platform issues, or support requests.</div>
+              </div>
+              <button
+                onClick={() => setIsIssueDialogOpen(false)}
+                style={{ marginLeft: 12, padding: 8, borderRadius: '50%', background: '#f3f4f6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                aria-label="Close"
+              >
+                <X style={{ width: 16, height: 16, color: '#6b7280' }} />
+              </button>
             </div>
-            <button
-              onClick={() => setIsIssueDialogOpen(false)}
-              className="ml-3 shrink-0 p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 transition-colors"
-              aria-label="Close"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Scrollable body */}
-          <div className="flex-1 overflow-y-auto bg-neutral-50/50">
-            <div className={`${isMobile ? 'p-4 flex flex-col gap-4' : 'p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-2 gap-8'}`}>
-
+            {/* Scrollable body */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 16, background: '#fafafa' }}>
               {/* Form Card */}
-              <div className="bg-white rounded-xl border border-neutral-200 shadow-xs p-5 flex flex-col gap-4">
+              <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e5e7eb', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Submit New Issue</h3>
-                  <p className="text-xs text-neutral-500 mt-0.5">Share details so support can resolve it faster.</p>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Submit New Issue</div>
+                  <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>Share details so support can resolve it faster.</div>
                 </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
-                    <label htmlFor="issue-title" className="text-sm font-semibold text-slate-700">Issue Title</label>
-                    <Input
-                      id="issue-title"
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Issue Title</label>
+                    <input
                       placeholder="e.g. Profile image upload fails"
-                      className="bg-neutral-50 border-neutral-200 h-11 text-base"
+                      style={{ width: '100%', height: 44, borderRadius: 8, border: '1px solid #e5e7eb', background: '#f9fafb', padding: '0 12px', fontSize: 16, boxSizing: 'border-box', outline: 'none' }}
                       value={issueTitle}
                       onChange={(e) => setIssueTitle(e.target.value)}
                     />
                   </div>
-
-                  <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'space-y-4'}`}>
-                    <div className="space-y-1.5">
-                      <label htmlFor="issue-category" className="text-sm font-semibold text-slate-700">Category</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Category</label>
                       <select
-                        id="issue-category"
-                        className="flex h-11 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        style={{ width: '100%', height: 44, borderRadius: 8, border: '1px solid #e5e7eb', background: '#f9fafb', padding: '0 10px', fontSize: 14, boxSizing: 'border-box', outline: 'none' }}
                         value={issueCategory}
                         onChange={(e) => setIssueCategory(e.target.value)}
                       >
-                        <option value="" disabled>Choose category</option>
+                        <option value="" disabled>Category</option>
                         <option value="Academic">Academic</option>
                         <option value="Technical">Technical / Bug</option>
                         <option value="Billing">Billing</option>
                         <option value="Other">Other</option>
                       </select>
                     </div>
-
-                    <div className="space-y-1.5">
-                      <label htmlFor="issue-priority" className="text-sm font-semibold text-slate-700">Priority</label>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Priority</label>
                       <select
-                        id="issue-priority"
-                        className="flex h-11 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        style={{ width: '100%', height: 44, borderRadius: 8, border: '1px solid #e5e7eb', background: '#f9fafb', padding: '0 10px', fontSize: 14, boxSizing: 'border-box', outline: 'none' }}
                         value={issuePriority}
                         onChange={(e) => setIssuePriority(e.target.value)}
                       >
@@ -705,72 +707,135 @@ export function Layout({ children, currentPage, onNavigate, hideSidebar = false 
                       </select>
                     </div>
                   </div>
-
-                  <div className="space-y-1.5">
-                    <label htmlFor="issue-desc" className="text-sm font-semibold text-slate-700">Description</label>
-                    <Textarea
-                      id="issue-desc"
+                  <div>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Description</label>
+                    <textarea
                       placeholder="Describe what happened, expected behavior, and steps to reproduce."
-                      className="h-28 bg-neutral-50 border-neutral-200 resize-none text-base"
+                      style={{ width: '100%', height: 110, borderRadius: 8, border: '1px solid #e5e7eb', background: '#f9fafb', padding: '10px 12px', fontSize: 16, boxSizing: 'border-box', resize: 'none', outline: 'none', fontFamily: 'inherit' }}
                       value={issueDescription}
                       onChange={(e) => setIssueDescription(e.target.value)}
                     />
                   </div>
                 </div>
-
-                <Button
+                <button
                   onClick={handleIssueSubmit}
-                  className="w-full font-semibold h-12 text-base mt-1"
-                  style={{ backgroundColor: '#111827', color: 'white' }}
+                  style={{ width: '100%', height: 48, borderRadius: 8, background: '#111827', color: 'white', border: 'none', fontWeight: 600, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                 >
-                  <AlertCircle className="w-4 h-4 mr-2" />
+                  <AlertCircle style={{ width: 16, height: 16 }} />
                   Submit Issue
-                </Button>
+                </button>
               </div>
 
               {/* History Card */}
-              <div className="bg-white rounded-xl border border-neutral-200 shadow-xs p-5">
-                <div className="mb-4">
-                  <h3 className="text-base font-bold text-slate-900">My Issue History</h3>
-                  <p className="text-xs text-neutral-500 mt-0.5">Track your reported issues and statuses.</p>
-                </div>
-
-                <div className="space-y-3">
+              <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e5e7eb', padding: 20 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 2 }}>My Issue History</div>
+                <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 16 }}>Track your reported issues and statuses.</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {submittedIssues.map((issue) => (
-                    <div key={issue.id} className="p-3.5 border border-neutral-100 rounded-lg bg-white shadow-xs">
-                      <div className="flex justify-between items-start mb-2 gap-2">
-                        <h4 className="font-semibold text-slate-800 text-sm flex-1 leading-snug">{issue.title}</h4>
-                        <div className="flex gap-1.5 shrink-0">
-                          <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs font-semibold uppercase tracking-wide">
-                            {issue.priority}
-                          </span>
-                          <span className={`px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide ${
-                            issue.status.toLowerCase() === 'open' ? 'bg-orange-50 text-orange-600' :
-                            issue.status.toLowerCase() === 'in-progress' ? 'bg-yellow-50 text-yellow-600' :
-                            'bg-green-50 text-green-600'
-                          }`}>
-                            {issue.status}
-                          </span>
+                    <div key={issue.id} style={{ padding: 14, border: '1px solid #f3f4f6', borderRadius: 10, background: 'white' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6, gap: 8 }}>
+                        <div style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', flex: 1, lineHeight: 1.4 }}>{issue.title}</div>
+                        <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                          <span style={{ padding: '2px 8px', borderRadius: 4, background: '#eff6ff', color: '#2563eb', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{issue.priority}</span>
+                          <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', background: issue.status.toLowerCase() === 'open' ? '#fff7ed' : issue.status.toLowerCase() === 'in-progress' ? '#fefce8' : '#f0fdf4', color: issue.status.toLowerCase() === 'open' ? '#ea580c' : issue.status.toLowerCase() === 'in-progress' ? '#ca8a04' : '#16a34a' }}>{issue.status}</span>
                         </div>
                       </div>
-                      <div className="text-xs text-neutral-500 mb-2 font-medium">
-                        {issue.date} · {issue.category}
-                      </div>
-                      <div className="bg-neutral-50 rounded-md p-2.5 flex gap-2.5 text-xs text-neutral-600">
-                        <Settings className="w-3.5 h-3.5 mt-0.5 text-neutral-400 shrink-0" />
-                        <p className="leading-relaxed">{issue.description}</p>
+                      <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>{issue.date} · {issue.category}</div>
+                      <div style={{ background: '#f9fafb', borderRadius: 6, padding: '8px 10px', display: 'flex', gap: 8, fontSize: 12, color: '#6b7280' }}>
+                        <Settings style={{ width: 13, height: 13, marginTop: 1, color: '#9ca3af', flexShrink: 0 }} />
+                        <p style={{ margin: 0, lineHeight: 1.5 }}>{issue.description}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
+              <div style={{ height: 24 }} />
             </div>
-            {/* Bottom safe area padding for mobile */}
-            {isMobile && <div className="h-6" />}
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>,
+        document.body
+      )}
+
+      {/* Desktop: normal Radix Dialog */}
+      {!isMobile && (
+        <Dialog open={isIssueDialogOpen} onOpenChange={setIsIssueDialogOpen}>
+          <DialogContent className="sm:max-w-[1000px] w-[95vw] h-[90vh] p-0 flex flex-col overflow-hidden bg-white">
+            <div className="shrink-0 flex items-center justify-between px-8 py-5 border-b border-neutral-100 bg-white">
+              <div>
+                <DialogTitle className="text-xl font-bold text-slate-900">Raise an Issue</DialogTitle>
+                <DialogDescription className="text-sm text-neutral-500 mt-0.5">Report bugs, platform issues, or support requests.</DialogDescription>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto bg-neutral-50/50">
+              <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="bg-white rounded-xl border border-neutral-200 shadow-xs p-6 flex flex-col gap-5">
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900">Submit New Issue</h3>
+                    <p className="text-xs text-neutral-500 mt-0.5">Share details so support can resolve it faster.</p>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-semibold text-slate-700">Issue Title</label>
+                      <Input placeholder="e.g. Profile image upload fails" className="bg-neutral-50 border-neutral-200" value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-semibold text-slate-700">Category</label>
+                      <select className="flex h-10 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm" value={issueCategory} onChange={(e) => setIssueCategory(e.target.value)}>
+                        <option value="" disabled>Choose category</option>
+                        <option value="Academic">Academic</option>
+                        <option value="Technical">Technical / Platform Bug</option>
+                        <option value="Billing">Billing or Payment</option>
+                        <option value="Other">Other Query</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-semibold text-slate-700">Priority</label>
+                      <select className="flex h-10 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm" value={issuePriority} onChange={(e) => setIssuePriority(e.target.value)}>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-semibold text-slate-700">Description</label>
+                      <Textarea placeholder="Describe what happened, expected behavior, and steps to reproduce." className="h-28 bg-neutral-50 border-neutral-200 resize-none" value={issueDescription} onChange={(e) => setIssueDescription(e.target.value)} />
+                    </div>
+                  </div>
+                  <Button onClick={handleIssueSubmit} className="w-full mt-2 font-semibold h-11" style={{ backgroundColor: '#111827', color: 'white' }}>
+                    <AlertCircle className="w-4 h-4 mr-2" />Submit Issue
+                  </Button>
+                </div>
+                <div className="bg-white rounded-xl border border-neutral-200 shadow-xs p-6">
+                  <div className="mb-5">
+                    <h3 className="text-base font-bold text-slate-900">My Issue History</h3>
+                    <p className="text-xs text-neutral-500 mt-0.5">Track your reported issues and statuses.</p>
+                  </div>
+                  <div className="space-y-3">
+                    {submittedIssues.map((issue) => (
+                      <div key={issue.id} className="p-4 border border-neutral-100 rounded-lg bg-white shadow-xs">
+                        <div className="flex justify-between items-start mb-2 gap-2">
+                          <h4 className="font-semibold text-slate-800 text-sm flex-1">{issue.title}</h4>
+                          <div className="flex gap-2 shrink-0">
+                            <span className="px-2.5 py-1 rounded bg-blue-50 text-blue-600 text-xs font-semibold uppercase">{issue.priority}</span>
+                            <span className={`px-2.5 py-1 rounded text-xs font-semibold uppercase ${issue.status.toLowerCase() === 'open' ? 'bg-orange-50 text-orange-600' : issue.status.toLowerCase() === 'in-progress' ? 'bg-yellow-50 text-yellow-600' : 'bg-green-50 text-green-600'}`}>{issue.status}</span>
+                          </div>
+                        </div>
+                        <div className="text-xs text-neutral-500 mb-3">{issue.date} · {issue.category}</div>
+                        <div className="bg-neutral-50 rounded p-3 flex gap-3 text-sm text-neutral-600">
+                          <Settings className="w-4 h-4 mt-0.5 text-neutral-400 shrink-0" />
+                          <p>{issue.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
