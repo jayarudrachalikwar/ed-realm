@@ -451,8 +451,8 @@ export function ContestParticipation({ contest, onSubmit, onExit }: ContestParti
                 <div className="flex items-center gap-4">
               <Button
   onClick={handleQuestionSubmit}
-  disabled={submittedQuestions.has(currentQuestion.id) || !answers[currentQuestion.id]}
-  className={`h-14 px-10 rounded-2xl font-black text-base shadow-xl transition-all active:scale-95 disabled:opacity-100 disabled:cursor-not-allowed ${submittedQuestions.has(currentQuestion.id) ? 'bg-green-100 text-green-700' : !answers[currentQuestion.id] ? 'bg-neutral-900 text-white': 'bg-neutral-900 text-white hover:bg-neutral-800'}`}
+  disabled={submittedQuestions.has(currentQuestion.id)}
+ className={`h-14 px-10 rounded-2xl font-black text-base shadow-xl transition-all active:scale-95 ${submittedQuestions.has(currentQuestion.id) ? 'bg-green-100 text-green-700' : answers[currentQuestion.id] ? 'bg-neutral-900 text-white hover:bg-neutral-800' : 'bg-neutral-900 text-white opacity-50 cursor-not-allowed pointer-events-none'}`}
 >
                     {submittedQuestions.has(currentQuestion.id) ? (
                       <span className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> Submitted</span>
@@ -597,10 +597,10 @@ export function ContestParticipation({ contest, onSubmit, onExit }: ContestParti
                       </div>
                     </div>
                     <Button
-                      onClick={handleQuestionSubmit}
-                      disabled={submittedQuestions.has(currentQuestion.id) || !answers[currentQuestion.id]}
-                      className={`font-black uppercase tracking-widest h-12 px-10 rounded-2xl transition-all active:scale-95 shadow-2xl ${submittedQuestions.has(currentQuestion.id) ? 'bg-green-500 text-white cursor-default' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
-                    >
+  onClick={handleQuestionSubmit}
+  disabled={submittedQuestions.has(currentQuestion.id)}
+ className={`h-14 px-10 rounded-2xl font-black text-base shadow-xl transition-all active:scale-95 ${submittedQuestions.has(currentQuestion.id) ? 'bg-green-100 text-green-700' : answers[currentQuestion.id] ? 'bg-neutral-900 text-white hover:bg-neutral-800' : 'bg-neutral-900 text-white opacity-50 cursor-not-allowed pointer-events-none'}`}
+>
                       {submittedQuestions.has(currentQuestion.id) ? 'Submitted' : 'Final Submit'}
                     </Button>
                   </div>
