@@ -449,15 +449,20 @@ export function ContestParticipation({ contest, onSubmit, onExit }: ContestParti
                   <span className="text-xs font-black text-neutral-400 uppercase tracking-widest">Question {currentQuestionIndex + 1} of {questions.length}</span>
                 </div>
                 <div className="flex items-center gap-4">
-            <button
+           <button
   onClick={handleQuestionSubmit}
   disabled={submittedQuestions.has(currentQuestion.id)}
-  style={{ color: submittedQuestions.has(currentQuestion.id) ? '#15803d' : '#ffffff', backgroundColor: submittedQuestions.has(currentQuestion.id) ? '#dcfce7' : '#171717', opacity: !answers[currentQuestion.id] && !submittedQuestions.has(currentQuestion.id) ? 0.5 : 1 }}
-  className="h-14 px-10 rounded-2xl font-black text-base shadow-xl transition-all active:scale-95 cursor-pointer"
+  className={`h-14 px-10 rounded-2xl font-black text-base shadow-xl transition-all active:scale-95
+    ${
+      submittedQuestions.has(currentQuestion.id)
+        ? 'bg-green-100 text-green-700'
+        : answers[currentQuestion.id]
+        ? 'bg-black text-white hover:bg-neutral-800'
+        : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+    }
+  `}
 >
-  {submittedQuestions.has(currentQuestion.id) ? (
-    <span className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> Submitted</span>
-  ) : 'Submit Answer'}
+  {submittedQuestions.has(currentQuestion.id) ? 'Submitted' : 'Submit Answer'}
 </button>
                   <Button
                     onClick={handleNext}
