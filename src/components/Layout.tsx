@@ -621,79 +621,97 @@ export function Layout({ children, currentPage, onNavigate, hideSidebar = false 
         </div>
       </main>
       <Dialog open={isIssueDialogOpen} onOpenChange={setIsIssueDialogOpen}>
-        <DialogContent className="sm:max-w-[1000px] w-[95vw] h-[90vh] p-0 flex flex-col overflow-hidden bg-white selection:bg-blue-100 selection:text-blue-900">
-          <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-neutral-50/50 block">
-            <DialogHeader className="mb-8 relative text-left space-y-2">
-              <DialogTitle className="text-2xl font-bold text-slate-900">Raise an Issue</DialogTitle>
-              <DialogDescription className="text-black">
-                Report bugs, platform issues, or support requests.
-              </DialogDescription>
+        <DialogContent className={`p-0 flex flex-col overflow-hidden bg-white selection:bg-blue-100 selection:text-blue-900 ${
+          isMobile
+            ? 'fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 w-full max-w-full rounded-t-2xl rounded-b-none h-[92dvh]'
+            : 'sm:max-w-[1000px] w-[95vw] h-[90vh]'
+        }`}
+          style={isMobile ? { top: 'auto', left: 0, right: 0, bottom: 0, transform: 'none' } : {}}>
 
-              <button
-                onClick={() => setIsIssueDialogOpen(false)}
-                className="absolute -top-2 right-0 p-2 text-neutral-400 hover:text-neutral-900 transition-colors"
-              >
-                X
-              </button>
-            </DialogHeader>
+          {/* Mobile drag handle */}
+          {isMobile && (
+            <div className="flex justify-center pt-3 pb-1 shrink-0">
+              <div className="w-10 h-1 rounded-full bg-neutral-300" />
+            </div>
+          )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
-              {/* Left Column: Form */}
-              <div className="bg-white rounded-xl shadow-xs border border-neutral-200 p-6 flex flex-col gap-6">
+          {/* Sticky header */}
+          <div className="shrink-0 flex items-center justify-between px-5 py-3 border-b border-neutral-100 bg-white">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 leading-tight">Raise an Issue</h2>
+              <p className="text-xs text-neutral-500 mt-0.5">Report bugs, platform issues, or support requests.</p>
+            </div>
+            <button
+              onClick={() => setIsIssueDialogOpen(false)}
+              className="ml-3 shrink-0 p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Scrollable body */}
+          <div className="flex-1 overflow-y-auto bg-neutral-50/50">
+            <div className={`${isMobile ? 'p-4 flex flex-col gap-4' : 'p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-2 gap-8'}`}>
+
+              {/* Form Card */}
+              <div className="bg-white rounded-xl border border-neutral-200 shadow-xs p-5 flex flex-col gap-4">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">Submit New Issue</h3>
-                  <p className="text-sm text-neutral-500">Share details so support can resolve it faster.</p>
+                  <h3 className="text-base font-bold text-slate-900">Submit New Issue</h3>
+                  <p className="text-xs text-neutral-500 mt-0.5">Share details so support can resolve it faster.</p>
                 </div>
 
-                <div className="space-y-5">
-                  <div className="space-y-2">
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
                     <label htmlFor="issue-title" className="text-sm font-semibold text-slate-700">Issue Title</label>
                     <Input
                       id="issue-title"
-                      placeholder="Example: Profile image upload fails"
-                      className="bg-neutral-50 border-neutral-200"
+                      placeholder="e.g. Profile image upload fails"
+                      className="bg-neutral-50 border-neutral-200 h-11 text-base"
                       value={issueTitle}
                       onChange={(e) => setIssueTitle(e.target.value)}
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label htmlFor="issue-category" className="text-sm font-semibold text-slate-700">Category</label>
-                    <select
-                      id="issue-category"
-                      className="flex h-10 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      value={issueCategory}
-                      onChange={(e) => setIssueCategory(e.target.value)}
-                    >
-                      <option value="" disabled>Choose category</option>
-                      <option value="Academic">Academic</option>
-                      <option value="Technical">Technical / Platform Bug</option>
-                      <option value="Billing">Billing or Payment</option>
-                      <option value="Other">Other Query</option>
-                    </select>
+                  <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'space-y-4'}`}>
+                    <div className="space-y-1.5">
+                      <label htmlFor="issue-category" className="text-sm font-semibold text-slate-700">Category</label>
+                      <select
+                        id="issue-category"
+                        className="flex h-11 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        value={issueCategory}
+                        onChange={(e) => setIssueCategory(e.target.value)}
+                      >
+                        <option value="" disabled>Choose category</option>
+                        <option value="Academic">Academic</option>
+                        <option value="Technical">Technical / Bug</option>
+                        <option value="Billing">Billing</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label htmlFor="issue-priority" className="text-sm font-semibold text-slate-700">Priority</label>
+                      <select
+                        id="issue-priority"
+                        className="flex h-11 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        value={issuePriority}
+                        onChange={(e) => setIssuePriority(e.target.value)}
+                      >
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label htmlFor="issue-priority" className="text-sm font-semibold text-slate-700">Priority</label>
-                    <select
-                      id="issue-priority"
-                      className="flex h-10 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      value={issuePriority}
-                      onChange={(e) => setIssuePriority(e.target.value)}
-                    >
-                      <option value="Low">Low</option>
-                      <option value="Medium">Medium</option>
-                      <option value="High">High</option>
-                      <option value="Critical">Critical</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <label htmlFor="issue-desc" className="text-sm font-semibold text-slate-700">Description</label>
                     <Textarea
                       id="issue-desc"
                       placeholder="Describe what happened, expected behavior, and steps to reproduce."
-                      className="h-28 bg-neutral-50 border-neutral-200 resize-none"
+                      className="h-28 bg-neutral-50 border-neutral-200 resize-none text-base"
                       value={issueDescription}
                       onChange={(e) => setIssueDescription(e.target.value)}
                     />
@@ -702,7 +720,7 @@ export function Layout({ children, currentPage, onNavigate, hideSidebar = false 
 
                 <Button
                   onClick={handleIssueSubmit}
-                  className="w-full mt-2 font-semibold h-11"
+                  className="w-full font-semibold h-12 text-base mt-1"
                   style={{ backgroundColor: '#111827', color: 'white' }}
                 >
                   <AlertCircle className="w-4 h-4 mr-2" />
@@ -710,48 +728,49 @@ export function Layout({ children, currentPage, onNavigate, hideSidebar = false 
                 </Button>
               </div>
 
-              {/* Right Column: History */}
-              <div className="bg-white rounded-xl shadow-xs border border-neutral-200 p-6">
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">My Issue History</h3>
-                  <p className="text-sm text-neutral-500">Track your reported issues and statuses.</p>
+              {/* History Card */}
+              <div className="bg-white rounded-xl border border-neutral-200 shadow-xs p-5">
+                <div className="mb-4">
+                  <h3 className="text-base font-bold text-slate-900">My Issue History</h3>
+                  <p className="text-xs text-neutral-500 mt-0.5">Track your reported issues and statuses.</p>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {submittedIssues.map((issue) => (
-                    <div key={issue.id} className="p-4 border border-neutral-100 rounded-lg hover:border-neutral-200 transition-colors bg-white shadow-xs">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-semibold text-slate-800 flex-1 pr-4">{issue.title}</h4>
-                        <div className="flex gap-2">
-                          <span className="px-2.5 py-1 rounded bg-blue-50 text-blue-600 text-xs font-semibold uppercase tracking-wider">
+                    <div key={issue.id} className="p-3.5 border border-neutral-100 rounded-lg bg-white shadow-xs">
+                      <div className="flex justify-between items-start mb-2 gap-2">
+                        <h4 className="font-semibold text-slate-800 text-sm flex-1 leading-snug">{issue.title}</h4>
+                        <div className="flex gap-1.5 shrink-0">
+                          <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs font-semibold uppercase tracking-wide">
                             {issue.priority}
                           </span>
-                          <span className={`px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider ${issue.status.toLowerCase() === 'open' ? 'bg-orange-50 text-orange-600' :
+                          <span className={`px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide ${
+                            issue.status.toLowerCase() === 'open' ? 'bg-orange-50 text-orange-600' :
                             issue.status.toLowerCase() === 'in-progress' ? 'bg-yellow-50 text-yellow-600' :
-                              'bg-green-50 text-green-600'
-                            }`}>
+                            'bg-green-50 text-green-600'
+                          }`}>
                             {issue.status}
                           </span>
                         </div>
                       </div>
-
-                      <div className="text-xs text-neutral-500 mb-3 font-medium">
-                        {issue.date} - {issue.category}
+                      <div className="text-xs text-neutral-500 mb-2 font-medium">
+                        {issue.date} · {issue.category}
                       </div>
-
-                      <div className="bg-neutral-50 rounded p-3 flex gap-3 text-sm text-neutral-600">
-                        <Settings className="w-4 h-4 mt-0.5 text-neutral-400 shrink-0" />
-                        <p>{issue.description}</p>
+                      <div className="bg-neutral-50 rounded-md p-2.5 flex gap-2.5 text-xs text-neutral-600">
+                        <Settings className="w-3.5 h-3.5 mt-0.5 text-neutral-400 shrink-0" />
+                        <p className="leading-relaxed">{issue.description}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
+
             </div>
+            {/* Bottom safe area padding for mobile */}
+            {isMobile && <div className="h-6" />}
           </div>
         </DialogContent>
       </Dialog>
     </div>
   );
 }
-
