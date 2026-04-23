@@ -761,86 +761,152 @@ export function Layout({ children, currentPage, onNavigate, hideSidebar = false 
       {/* Desktop: normal Radix Dialog */}
       {!isMobile && (
         <Dialog open={isIssueDialogOpen} onOpenChange={setIsIssueDialogOpen}>
-          <DialogContent className="sm:max-w-[1000px] w-[95vw] h-[90vh] p-0 flex flex-col overflow-hidden bg-white [&>button:last-of-type]:hidden">
-            <div className="shrink-0 flex items-center justify-between px-8 py-5 border-b border-neutral-100 bg-white">
-              <div>
-                <DialogTitle className="text-xl font-bold text-slate-900">Raise an Issue</DialogTitle>
-                <DialogDescription className="text-sm text-neutral-500 mt-0.5">Report bugs, platform issues, or support requests.</DialogDescription>
+          <DialogContent
+            style={{ maxWidth: 'min(820px, calc(100vw - 2rem))', maxHeight: '88vh', padding: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRadius: 16, boxShadow: '0 25px 50px rgba(0,0,0,0.25)' }}
+            className="bg-white [&>button:last-of-type]:hidden"
+          >
+            {/* Dark gradient header */}
+            <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)', padding: '18px 24px', display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(139,92,246,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <AlertCircle style={{ width: 18, height: 18, color: '#c4b5fd' }} />
               </div>
+              <div style={{ flex: 1 }}>
+                <DialogTitle style={{ fontSize: 16, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.3 }}>Raise an Issue</DialogTitle>
+                <DialogDescription style={{ fontSize: 12, color: '#94a3b8', margin: 0, marginTop: 2 }}>Report bugs, platform issues, or support requests.</DialogDescription>
+              </div>
+              {/* Visible white close button */}
               <DialogClose asChild>
                 <button
-                  className="flex items-center justify-center w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors"
+                  style={{
+                    width: 32, height: 32, borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.15)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', flexShrink: 0,
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.28)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.15)')}
                   aria-label="Close"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  <X style={{ width: 15, height: 15, color: '#ffffff' }} />
                 </button>
               </DialogClose>
             </div>
-            <div className="flex-1 overflow-y-auto bg-neutral-50/50">
-              <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white rounded-xl border border-neutral-200 shadow-xs p-6 flex flex-col gap-5">
+            {/* Body — flex row, two-column */}
+            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', background: '#f8fafc', padding: 20, display: 'flex', gap: 16, minHeight: 0 }}>
+
+              {/* Left — Submit form */}
+              <div style={{ flex: '0 0 calc(50% - 8px)', minWidth: 0, background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(124,58,237,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <AlertCircle style={{ width: 14, height: 14, color: '#7c3aed' }} />
+                  </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-900">Submit New Issue</h3>
-                    <p className="text-xs text-neutral-500 mt-0.5">Share details so support can resolve it faster.</p>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', lineHeight: 1.3 }}>Submit New Issue</div>
+                    <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 1 }}>Share details so support can resolve it faster.</div>
                   </div>
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-slate-700">Issue Title</label>
-                      <Input placeholder="e.g. Profile image upload fails" className="bg-neutral-50 border-neutral-200" value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-slate-700">Category</label>
-                      <select className="flex h-10 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm" value={issueCategory} onChange={(e) => setIssueCategory(e.target.value)}>
-                        <option value="" disabled>Choose category</option>
-                        <option value="Academic">Academic</option>
-                        <option value="Technical">Technical / Platform Bug</option>
-                        <option value="Billing">Billing or Payment</option>
-                        <option value="Other">Other Query</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-slate-700">Priority</label>
-                      <select className="flex h-10 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm" value={issuePriority} onChange={(e) => setIssuePriority(e.target.value)}>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                        <option value="Critical">Critical</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-slate-700">Description</label>
-                      <Textarea placeholder="Describe what happened, expected behavior, and steps to reproduce." className="h-28 bg-neutral-50 border-neutral-200 resize-none" value={issueDescription} onChange={(e) => setIssueDescription(e.target.value)} />
-                    </div>
-                  </div>
-                  <Button onClick={handleIssueSubmit} className="w-full mt-2 font-semibold h-11" style={{ backgroundColor: '#111827', color: 'white' }}>
-                    <AlertCircle className="w-4 h-4 mr-2" />Submit Issue
-                  </Button>
                 </div>
-                <div className="bg-white rounded-xl border border-neutral-200 shadow-xs p-6">
-                  <div className="mb-5">
-                    <h3 className="text-base font-bold text-slate-900">My Issue History</h3>
-                    <p className="text-xs text-neutral-500 mt-0.5">Track your reported issues and statuses.</p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>Issue Title</label>
+                    <input
+                      placeholder="e.g. Profile image upload fails"
+                      style={{ width: '100%', height: 36, borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', padding: '0 12px', fontSize: 14, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit' }}
+                      value={issueTitle}
+                      onChange={(e) => setIssueTitle(e.target.value)}
+                    />
                   </div>
-                  <div className="space-y-3">
-                    {submittedIssues.map((issue) => (
-                      <div key={issue.id} className="p-4 border border-neutral-100 rounded-lg bg-white shadow-xs">
-                        <div className="flex justify-between items-start mb-2 gap-2">
-                          <h4 className="font-semibold text-slate-800 text-sm flex-1">{issue.title}</h4>
-                          <div className="flex gap-2 shrink-0">
-                            <span className="px-2.5 py-1 rounded bg-blue-50 text-blue-600 text-xs font-semibold uppercase">{issue.priority}</span>
-                            <span className={`px-2.5 py-1 rounded text-xs font-semibold uppercase ${issue.status.toLowerCase() === 'open' ? 'bg-orange-50 text-orange-600' : issue.status.toLowerCase() === 'in-progress' ? 'bg-yellow-50 text-yellow-600' : 'bg-green-50 text-green-600'}`}>{issue.status}</span>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>Category</label>
+                      <select
+                        style={{ width: '100%', height: 36, borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', padding: '0 10px', fontSize: 13, boxSizing: 'border-box', outline: 'none' }}
+                        value={issueCategory}
+                        onChange={(e) => setIssueCategory(e.target.value)}
+                      >
+                        <option value="" disabled>Choose...</option>
+                        <option value="Academic">Academic</option>
+                        <option value="Technical">Technical / Bug</option>
+                        <option value="Billing">Billing</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>Priority</label>
+                      <select
+                        style={{ width: '100%', height: 36, borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', padding: '0 10px', fontSize: 13, boxSizing: 'border-box', outline: 'none' }}
+                        value={issuePriority}
+                        onChange={(e) => setIssuePriority(e.target.value)}
+                      >
+                        <option value="Low">🟢 Low</option>
+                        <option value="Medium">🟡 Medium</option>
+                        <option value="High">🟠 High</option>
+                        <option value="Critical">🔴 Critical</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>Description</label>
+                    <textarea
+                      placeholder="Describe what happened, expected behavior, and steps to reproduce."
+                      style={{ width: '100%', height: 100, borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', padding: '10px 12px', fontSize: 13, boxSizing: 'border-box', resize: 'none', outline: 'none', fontFamily: 'inherit', lineHeight: 1.5 }}
+                      value={issueDescription}
+                      onChange={(e) => setIssueDescription(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleIssueSubmit}
+                  style={{ width: '100%', height: 40, borderRadius: 8, background: 'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 100%)', color: 'white', border: 'none', fontWeight: 600, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontFamily: 'inherit' }}
+                >
+                  <AlertCircle style={{ width: 15, height: 15 }} />
+                  Submit Issue
+                </button>
+              </div>
+
+              {/* Right — Issue History */}
+              <div style={{ flex: '0 0 calc(50% - 8px)', minWidth: 0, background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 8, background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Clock style={{ width: 14, height: 14, color: '#059669' }} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', lineHeight: 1.3 }}>My Issue History</div>
+                    <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 1 }}>Track your reported issues and statuses.</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, overflowY: 'auto', flex: 1 }}>
+                  {submittedIssues.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                      <CheckCircle2 style={{ width: 32, height: 32, color: '#e2e8f0', margin: '0 auto 8px' }} />
+                      <p style={{ fontSize: 13, color: '#94a3b8' }}>No issues submitted yet</p>
+                    </div>
+                  ) : (
+                    submittedIssues.map((issue) => (
+                      <div key={issue.id} style={{ padding: 14, border: '1px solid #f1f5f9', borderRadius: 10, background: '#fafafa' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6, gap: 8 }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', flex: 1, lineHeight: 1.4 }}>{issue.title}</div>
+                          <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
+                            <span style={{ padding: '2px 7px', borderRadius: 999, background: '#eff6ff', color: '#2563eb', fontSize: 10, fontWeight: 700, textTransform: 'uppercase' as const }}>{issue.priority}</span>
+                            <span style={{ padding: '2px 7px', borderRadius: 999, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' as const, background: issue.status.toLowerCase() === 'open' ? '#fff7ed' : issue.status.toLowerCase() === 'in-progress' ? '#fefce8' : '#f0fdf4', color: issue.status.toLowerCase() === 'open' ? '#ea580c' : issue.status.toLowerCase() === 'in-progress' ? '#ca8a04' : '#16a34a' }}>{issue.status}</span>
                           </div>
                         </div>
-                        <div className="text-xs text-neutral-500 mb-3">{issue.date} · {issue.category}</div>
-                        <div className="bg-neutral-50 rounded p-3 flex gap-3 text-sm text-neutral-600">
-                          <Settings className="w-4 h-4 mt-0.5 text-neutral-400 shrink-0" />
-                          <p>{issue.description}</p>
+                        <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 8 }}>{issue.date} · {issue.category}</div>
+                        <div style={{ background: 'white', border: '1px solid #f1f5f9', borderRadius: 8, padding: '8px 10px', display: 'flex', gap: 8, fontSize: 12, color: '#64748b' }}>
+                          <Settings style={{ width: 12, height: 12, marginTop: 1, color: '#cbd5e1', flexShrink: 0 }} />
+                          <p style={{ margin: 0, lineHeight: 1.5 }}>{issue.description}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    ))
+                  )}
                 </div>
               </div>
+
             </div>
           </DialogContent>
         </Dialog>
