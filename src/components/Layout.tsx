@@ -12,6 +12,7 @@ import {
 } from './ui/dropdown-menu';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -760,12 +761,20 @@ export function Layout({ children, currentPage, onNavigate, hideSidebar = false 
       {/* Desktop: normal Radix Dialog */}
       {!isMobile && (
         <Dialog open={isIssueDialogOpen} onOpenChange={setIsIssueDialogOpen}>
-          <DialogContent className="sm:max-w-[1000px] w-[95vw] h-[90vh] p-0 flex flex-col overflow-hidden bg-white">
+          <DialogContent className="sm:max-w-[1000px] w-[95vw] h-[90vh] p-0 flex flex-col overflow-hidden bg-white [&>button:last-of-type]:hidden">
             <div className="shrink-0 flex items-center justify-between px-8 py-5 border-b border-neutral-100 bg-white">
               <div>
                 <DialogTitle className="text-xl font-bold text-slate-900">Raise an Issue</DialogTitle>
                 <DialogDescription className="text-sm text-neutral-500 mt-0.5">Report bugs, platform issues, or support requests.</DialogDescription>
               </div>
+              <DialogClose asChild>
+                <button
+                  className="flex items-center justify-center w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors"
+                  aria-label="Close"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </DialogClose>
             </div>
             <div className="flex-1 overflow-y-auto bg-neutral-50/50">
               <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
